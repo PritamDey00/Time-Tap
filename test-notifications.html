@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notification Test</title>
+</head>
+<body>
+    <h1>Enhanced Notification System Test</h1>
+    <button onclick="testNotifications()">Test Notifications</button>
+    <button onclick="testMusic()">Test Background Music</button>
+    <div id="status"></div>
+
+    <script>
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML += '<p>' + message + '</p>';
+        }
+
+        function testNotifications() {
+            updateStatus('Testing notification system...');
+            
+            if (!('Notification' in window)) {
+                updateStatus('❌ This browser does not support notifications');
+                return;
+            }
+
+            if (Notification.permission === 'granted') {
+                updateStatus('✅ Notifications already granted');
+                showTestNotification();
+            } else if (Notification.permission === 'denied') {
+                updateStatus('❌ Notifications are blocked');
+            } else {
+                updateStatus('🔄 Requesting notification permission...');
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        updateStatus('✅ Notification permission granted!');
+                        showTestNotification();
+                    } else {
+                        updateStatus('❌ Notification permission denied');
+                    }
+                });
+            }
+        }
+
+        function showTestNotification() {
+            try {
+                const notification = new Notification('🎯 Test Notification', {
+                    body: 'This is a test of the enhanced notification system!',
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200],
+                    tag: 'test-notification'
+                });
+
+                notification.onclick = () => {
+                    updateStatus('✅ Notification clicked!');
+                    notification.close();
+                };
+
+                updateStatus('📢 Test notification sent!');
+            } catch (e) {
+                updateStatus('❌ Error creating notification: ' + e.message);
+            }
+        }
+
+        function testMusic() {
+            updateStatus('Testing background music...');
+            
+            try {
+                const audio = new Audio('/music.mp3');
+                audio.volume = 0.3;
+                audio.loop = true;
+                
+                audio.play().then(() => {
+                    updateStatus('🎵 Background music started!');
+                    setTimeout(() => {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        updateStatus('🔇 Background music stopped');
+                    }, 3000);
+                }).catch(e => {
+                    updateStatus('❌ Music autoplay blocked: ' + e.message);
+                    updateStatus('💡 Try clicking on the page first, then test music');
+                });
+            } catch (e) {
+                updateStatus('❌ Error with music: ' + e.message);
+            }
+        }
+
+        // Auto-request permissions on page load
+        window.onload = () => {
+            updateStatus('🚀 Enhanced notification system loaded');
+            updateStatus('📱 Features:');
+            updateStatus('  • Persistent notifications that stay visible');
+            updateStatus('  • Background music during confirmation window');
+            updateStatus('  • Repeated alerts every 15 seconds');
+            updateStatus('  • Works even when tab is not active');
+            updateStatus('  • Success notifications after confirmation');
+            updateStatus('  • Vibration support on mobile devices');
+        };
+    </script>
+</body>
+</html>
