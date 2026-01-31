@@ -1,5 +1,8 @@
 // Using built-in fetch (Node.js 18+)
+<<<<<<< HEAD
 import { handleApiError, getRequestContext, logApiRequest } from '../../lib/apiErrorHandler';
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
 /*
   Server-side IP geolocation endpoint (optional).
@@ -7,6 +10,7 @@ import { handleApiError, getRequestContext, logApiRequest } from '../../lib/apiE
   Note: this uses a public API (ipapi.co) for demo. For production, use MaxMind or a paid API and respect privacy.
 */
 export default async function handler(req, res) {
+<<<<<<< HEAD
   try {
     // Log request for debugging
     logApiRequest(req, { endpoint: 'geolocate' });
@@ -48,6 +52,24 @@ export default async function handler(req, res) {
     
     const data = await r.json();
     console.log('Geolocation successful:', { ip: data.ip, city: data.city });
+=======
+  // Get IP (behind proxies use x-forwarded-for)
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip = forwarded ? forwarded.split(',')[0].trim() : req.socket.remoteAddress;
+
+  try {
+    // ipapi.co: free tier but rate-limited. If ip is private/unavailable, use default lookup
+    const url = `https://ipapi.co/${ip ? encodeURIComponent(ip) : ''}/json/`;
+    const r = await fetch(url, { timeout: 5000 });
+    if (!r.ok) {
+      // fallback to ipapi.co/json (server IP)
+      const r2 = await fetch('https://ipapi.co/json/', { timeout: 5000 });
+      const data2 = await r2.json();
+      res.json({ ip: data2.ip || null, city: data2.city || null, region: data2.region || null, country: data2.country_name || null, timezone: data2.timezone || null, raw: data2 });
+      return;
+    }
+    const data = await r.json();
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     res.json({
       ip: data.ip || null,
       city: data.city || null,
@@ -56,6 +78,7 @@ export default async function handler(req, res) {
       timezone: data.timezone || null,
       raw: data
     });
+<<<<<<< HEAD
     
   } catch (error) {
     const context = getRequestContext(req);
@@ -65,5 +88,10 @@ export default async function handler(req, res) {
       error.message = 'Geolocation service temporarily unavailable';
     }
     return handleApiError(error, res, context);
+=======
+  } catch (err) {
+    // best-effort safe response
+    res.status(500).json({ error: 'geolocation_failed', message: err.message || String(err) });
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
   }
 }

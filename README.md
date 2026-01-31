@@ -38,12 +38,16 @@ This platform stores user data in `data/users.json` for development. For product
 ## Quick Start (Local Development)
 
 1. **Setup Files**: Copy the repo files to a folder
+<<<<<<< HEAD
 2. **Environment Configuration**: 
    ```bash
    cp .env.example .env.local
    # Edit .env.local and set a secure JWT_SECRET
    ```
    For detailed environment setup, see [Environment Variables Guide](docs/ENVIRONMENT_VARIABLES.md)
+=======
+2. **Environment**: Create a `.env.local` file based on `.env.example`
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 3. **Install Dependencies**: 
    ```bash
    npm install
@@ -55,6 +59,7 @@ This platform stores user data in `data/users.json` for development. For product
 5. **Access Application**: Open http://localhost:3000
 6. **First Use**: Register an account and you'll be redirected to the classroom selection page
 
+<<<<<<< HEAD
 ## Production Deployment
 
 For production deployment on Vercel or other platforms:
@@ -76,6 +81,15 @@ For production deployment on Vercel or other platforms:
   - HTTPS is enforced in production
   - Secure Redis configuration for data persistence
   - Consider additional rate limiting for high-traffic deployments
+=======
+Notes
+- Persistence: data/users.json is used. On serverless platforms that don't write to the filesystem, use a DB or external store.
+- Security: This is a prototype. For production:
+  - Use a proper DB
+  - Use HTTPS
+  - Use strong JWT secret in environment variables
+  - Consider salt rounds & rate limiting
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
 How the confirmation / streak logic works
 - Each user has lastConfirm timestamp.
@@ -108,11 +122,16 @@ How the confirmation / streak logic works
 ### Real-time Features
 - `GET /api/classrooms/[id]/events` - WebSocket endpoint for real-time chat and updates
 
+<<<<<<< HEAD
 ## Environment Configuration
 
 - **Development**: Copy `.env.example` to `.env.local` and set `JWT_SECRET`
 - **Production**: Configure Redis environment variables for Vercel deployment
 - **Complete Guide**: See [Environment Variables Documentation](docs/ENVIRONMENT_VARIABLES.md) for detailed setup instructions
+=======
+Environment
+- Copy `.env.example` to `.env.local` and set JWT_SECRET.
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
 ## Project Structure
 
@@ -131,7 +150,10 @@ How the confirmation / streak logic works
 - **AccountButton.jsx** - Mobile-optimized user account access
 
 ### Documentation
+<<<<<<< HEAD
 - `docs/ENVIRONMENT_VARIABLES.md` - Complete environment configuration guide
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 - `docs/ANONYMOUS_MODE_GUIDE.md` - Anonymous mode usage guide
 - `docs/LEAVE_CLASSROOM_GUIDE.md` - Leave classroom feature guide
 - `docs/UNIVERSAL_CLASSROOM_NAVIGATION.md` - Navigation flow documentation

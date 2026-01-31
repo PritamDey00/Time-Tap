@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { fetchWithRetry, classifyError } from '../lib/fetchWithRetry';
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
 export default function PersonalTodoList({ userId, className = '' }) {
   const [todos, setTodos] = useState([]);
@@ -8,9 +11,13 @@ export default function PersonalTodoList({ userId, className = '' }) {
   const [editingText, setEditingText] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+<<<<<<< HEAD
   const [errorInfo, setErrorInfo] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+=======
+  const [isSubmitting, setIsSubmitting] = useState(false);
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
   // Load todos on component mount
   useEffect(() => {
@@ -23,18 +30,32 @@ export default function PersonalTodoList({ userId, className = '' }) {
     try {
       setLoading(true);
       setError(null);
+<<<<<<< HEAD
       setErrorInfo(null);
       setRetryCount(0);
       
       const response = await fetchWithRetry('/api/personal-todos');
+=======
+      
+      const response = await fetch('/api/personal-todos');
+      
+      if (!response.ok) {
+        throw new Error('Failed to load todos');
+      }
+      
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
       const data = await response.json();
       setTodos(data);
       
     } catch (err) {
       console.error('Error loading todos:', err);
+<<<<<<< HEAD
       const errInfo = classifyError(err);
       setError(errInfo.message);
       setErrorInfo(errInfo);
+=======
+      setError('Failed to load todos. Please try again.');
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     } finally {
       setLoading(false);
     }
@@ -45,6 +66,7 @@ export default function PersonalTodoList({ userId, className = '' }) {
     if (!newTodoText.trim() || isSubmitting) return;
 
     const todoText = newTodoText.trim();
+<<<<<<< HEAD
     const tempId = 'temp-' + Date.now();
     
     // Optimistic update
@@ -65,11 +87,19 @@ export default function PersonalTodoList({ userId, className = '' }) {
 
     try {
       const response = await fetchWithRetry('/api/personal-todos', {
+=======
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/personal-todos', {
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: todoText })
       });
 
+<<<<<<< HEAD
       const newTodo = await response.json();
       // Replace optimistic todo with real one
       setTodos(prev => prev.map(t => t.id === tempId ? newTodo : t));
@@ -81,6 +111,18 @@ export default function PersonalTodoList({ userId, className = '' }) {
       // Revert optimistic update
       setTodos(prev => prev.filter(t => t.id !== tempId));
       setNewTodoText(todoText); // Restore text so user can retry
+=======
+      if (response.ok) {
+        const newTodo = await response.json();
+        setTodos(prev => [...prev, newTodo]);
+        setNewTodoText('');
+      } else {
+        setError('Failed to add todo');
+      }
+    } catch (err) {
+      setError('Failed to add todo');
+      console.error('Error adding todo:', err);
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +130,10 @@ export default function PersonalTodoList({ userId, className = '' }) {
 
   const toggleTodo = async (todoId) => {
     setError(null);
+<<<<<<< HEAD
     setErrorInfo(null);
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
     // Optimistic update
     const previousTodos = todos;
@@ -99,6 +144,7 @@ export default function PersonalTodoList({ userId, className = '' }) {
     ));
 
     try {
+<<<<<<< HEAD
       const response = await fetchWithRetry(`/api/personal-todos/${todoId}/toggle`, {
         method: 'PATCH'
       });
@@ -114,6 +160,27 @@ export default function PersonalTodoList({ userId, className = '' }) {
       setErrorInfo(errInfo);
       // Revert on failure
       setTodos(previousTodos);
+=======
+      const response = await fetch(`/api/personal-todos/${todoId}/toggle`, {
+        method: 'PATCH'
+      });
+
+      if (response.ok) {
+        const updatedTodo = await response.json();
+        setTodos(prev => prev.map(todo => 
+          todo.id === todoId ? updatedTodo : todo
+        ));
+      } else {
+        // Revert on failure
+        setTodos(previousTodos);
+        setError('Failed to update todo');
+      }
+    } catch (err) {
+      // Revert on failure
+      setTodos(previousTodos);
+      setError('Failed to update todo');
+      console.error('Error toggling todo:', err);
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     }
   };
 
@@ -128,6 +195,7 @@ export default function PersonalTodoList({ userId, className = '' }) {
       return;
     }
 
+<<<<<<< HEAD
     const newText = editingText.trim();
     const previousTodos = todos;
     
@@ -161,6 +229,29 @@ export default function PersonalTodoList({ userId, className = '' }) {
       // Restore editing state so user can retry
       setEditingId(todoId);
       setEditingText(newText);
+=======
+    try {
+      const response = await fetch(`/api/personal-todos/${todoId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: editingText.trim() })
+      });
+
+      if (response.ok) {
+        const updatedTodo = await response.json();
+        setTodos(prev => prev.map(todo => 
+          todo.id === todoId ? updatedTodo : todo
+        ));
+        setEditingId(null);
+        setEditingText('');
+        setError(null);
+      } else {
+        setError('Failed to update todo');
+      }
+    } catch (err) {
+      setError('Failed to update todo');
+      console.error('Error updating todo:', err);
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     }
   };
 
@@ -171,13 +262,17 @@ export default function PersonalTodoList({ userId, className = '' }) {
 
   const deleteTodo = async (todoId) => {
     setError(null);
+<<<<<<< HEAD
     setErrorInfo(null);
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
     // Optimistic update
     const previousTodos = todos;
     setTodos(prev => prev.filter(todo => todo.id !== todoId));
 
     try {
+<<<<<<< HEAD
       await fetchWithRetry(`/api/personal-todos/${todoId}`, {
         method: 'DELETE'
       });
@@ -188,6 +283,22 @@ export default function PersonalTodoList({ userId, className = '' }) {
       setErrorInfo(errInfo);
       // Revert on failure
       setTodos(previousTodos);
+=======
+      const response = await fetch(`/api/personal-todos/${todoId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        // Revert on failure
+        setTodos(previousTodos);
+        setError('Failed to delete todo');
+      }
+    } catch (err) {
+      // Revert on failure
+      setTodos(previousTodos);
+      setError('Failed to delete todo');
+      console.error('Error deleting todo:', err);
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     }
   };
 
@@ -282,6 +393,7 @@ export default function PersonalTodoList({ userId, className = '' }) {
         )}
       </div>
 
+<<<<<<< HEAD
       {error && errorInfo && (
         <div className="todo-error">
           <div className="error-header">
@@ -302,6 +414,12 @@ export default function PersonalTodoList({ userId, className = '' }) {
               Dismiss
             </button>
           </div>
+=======
+      {error && (
+        <div className="todo-error">
+          <span>⚠️ {error}</span>
+          <button onClick={loadTodos} className="retry-btn">Retry</button>
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
         </div>
       )}
 
@@ -475,6 +593,7 @@ export default function PersonalTodoList({ userId, className = '' }) {
         }
 
         .todo-error {
+<<<<<<< HEAD
           padding: 16px;
           border-radius: 12px;
           background: rgba(239, 68, 68, 0.1);
@@ -520,18 +639,40 @@ export default function PersonalTodoList({ userId, className = '' }) {
 
         .retry-btn,
         .dismiss-btn {
+=======
+          padding: 12px 16px;
+          border-radius: 12px;
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          color: #dc2626;
+          font-size: 14px;
+          margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .retry-btn {
+          background: var(--theme-primary);
+          color: white;
+          border: none;
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
           padding: 6px 12px;
           border-radius: 6px;
           font-size: 12px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s ease;
+<<<<<<< HEAD
           border: none;
         }
 
         .retry-btn {
           background: var(--theme-primary);
           color: white;
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
         }
 
         .retry-btn:hover {
@@ -539,6 +680,7 @@ export default function PersonalTodoList({ userId, className = '' }) {
           transform: translateY(-1px);
         }
 
+<<<<<<< HEAD
         .dismiss-btn {
           background: var(--card-secondary);
           color: var(--primary);
@@ -550,6 +692,8 @@ export default function PersonalTodoList({ userId, className = '' }) {
           transform: translateY(-1px);
         }
 
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
         .todo-form {
           display: flex;
           gap: 12px;

@@ -6,7 +6,10 @@ Welcome to the comprehensive documentation for the Classroom Learning Platform. 
 
 ### 🚀 Getting Started
 - **[Main README](../README.md)** - Project overview, setup, and quick start guide
+<<<<<<< HEAD
 - **[Environment Variables](ENVIRONMENT_VARIABLES.md)** - Complete environment configuration guide
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 - **[Environment Setup](../.env.example)** - Environment configuration template
 
 ### 🎯 Feature Guides
@@ -21,9 +24,12 @@ Welcome to the comprehensive documentation for the Classroom Learning Platform. 
 
 ### 🔧 Technical Documentation
 
+<<<<<<< HEAD
 #### Configuration
 - **[Environment Variables](ENVIRONMENT_VARIABLES.md)** - Complete environment setup and configuration guide
 
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 #### Existing Technical Guides
 - **[Notification Features](../NOTIFICATION_FEATURES.md)** - Enhanced notification system with music and alerts
 - **[Chat Improvements Summary](../CHAT_IMPROVEMENTS_SUMMARY.md)** - Real-time chat functionality improvements

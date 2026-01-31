@@ -352,6 +352,7 @@ export default function ClassroomDashboard({ classroomId, user, isAnonymous = fa
 
               {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
                 <div className="notification-banner">
+<<<<<<< HEAD
                   <strong>⚠️ Enable notifications & microphone</strong> to get alerts when confirmation window opens!
                   <button onClick={async () => {
                     // Request notification permission
@@ -368,6 +369,10 @@ export default function ClassroomDashboard({ classroomId, user, isAnonymous = fa
                       // Don't show error to user - microphone is optional
                     }
                   }}>
+=======
+                  <strong>⚠️ Enable notifications</strong> to get alerts when confirmation window opens!
+                  <button onClick={() => Notification.requestPermission()}>
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
                     Enable
                   </button>
                 </div>

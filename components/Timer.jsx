@@ -9,8 +9,11 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
     const [isAnimatingIn, setIsAnimatingIn] = useState(false);
     const [isAnimatingOut, setIsAnimatingOut] = useState(false);
     const [testMode, setTestMode] = useState(false);
+<<<<<<< HEAD
     const [audioBlocked, setAudioBlocked] = useState(false);
     const [userInteracted, setUserInteracted] = useState(false);
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     const audioRef = useRef(null);
     const musicRef = useRef(null);
     const notifiedRef = useRef(false);
@@ -18,7 +21,10 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
     const notificationIntervalRef = useRef(null);
     const prevInWindowRef = useRef(false);
     const windowStartTimeRef = useRef(null);
+<<<<<<< HEAD
     const interactionHandlerRef = useRef(null);
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
 
     // Check for test mode from URL
     useEffect(() => {
@@ -92,6 +98,7 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
         };
     }
 
+<<<<<<< HEAD
     // Handle user interaction to enable audio playback
     function handleUserInteraction() {
         console.log('User interaction detected - attempting to enable audio');
@@ -149,6 +156,8 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
         }
     }
 
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     useEffect(() => {
         // Request notification permission on component mount
         if (Notification && Notification.permission === "default") {
@@ -160,6 +169,7 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
         musicRef.current.loop = true;
         musicRef.current.volume = 0.3; // Set volume to 30%
 
+<<<<<<< HEAD
         // Add error handler for missing audio file
         musicRef.current.onerror = () => {
             console.error('Failed to load music.mp3 - continuing without background music');
@@ -168,6 +178,8 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
         // Set up interaction listeners for autoplay handling
         setupInteractionListeners();
 
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
         // create a short beep generator (WebAudio) element
         audioRef.current = {
             play: () => {
@@ -190,6 +202,7 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
 
         // Cleanup function
         return () => {
+<<<<<<< HEAD
             // Remove interaction listeners
             if (interactionHandlerRef.current) {
                 ['click', 'touchstart', 'keydown'].forEach(event => {
@@ -198,6 +211,8 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
                 interactionHandlerRef.current = null;
             }
             
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
             if (musicRef.current) {
                 musicRef.current.pause();
                 musicRef.current = null;
@@ -211,6 +226,7 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
         };
     }, []);
 
+<<<<<<< HEAD
     // Handle test mode music and notifications
     useEffect(() => {
         if (testMode && inWindow && musicRef.current && !notifiedRef.current) {
@@ -228,6 +244,8 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
         }
     }, [testMode, inWindow]);
 
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
     // Handle animation states when window opens/closes
     useEffect(() => {
         if (inWindow && !prevInWindowRef.current) {
@@ -257,6 +275,7 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
                 if (!notifiedRef.current) {
                     notifiedRef.current = true;
                     
+<<<<<<< HEAD
                     // Start background music with autoplay detection
                     if (musicRef.current) {
                         if (userInteracted) {
@@ -266,6 +285,13 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
                             // First time, attempt playback and detect if blocked
                             attemptMusicPlayback();
                         }
+=======
+                    // Start background music
+                    if (musicRef.current) {
+                        musicRef.current.play().catch(e => {
+                            console.log('Music autoplay blocked:', e);
+                        });
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
                     }
                     
                     // Play initial beep sound
@@ -338,6 +364,7 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
                     }, 15000); // Every 15 seconds
                 }
             } else {
+<<<<<<< HEAD
                 // Don't close window if in test mode
                 if (!testMode) {
                     setInWindow(false);
@@ -363,6 +390,30 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
                             notificationRef.current.close();
                             notificationRef.current = null;
                         }
+=======
+                setInWindow(false);
+                setHasConfirmed(false); // Reset for next window
+                windowStartTimeRef.current = null; // Reset window start time
+                if (notifiedRef.current) {
+                    notifiedRef.current = false;
+                    
+                    // Stop background music
+                    if (musicRef.current) {
+                        musicRef.current.pause();
+                        musicRef.current.currentTime = 0; // Reset to beginning
+                    }
+                    
+                    // Clear notification interval
+                    if (notificationIntervalRef.current) {
+                        clearInterval(notificationIntervalRef.current);
+                        notificationIntervalRef.current = null;
+                    }
+                    
+                    // Close notification
+                    if (notificationRef.current) {
+                        notificationRef.current.close();
+                        notificationRef.current = null;
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
                     }
                 }
             }
@@ -499,12 +550,15 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
             )}
             {(inWindow || isAnimatingOut) ? (
                 <div className={`confirm-area ${isAnimatingIn ? 'animating-in' : ''} ${isAnimatingOut ? 'animating-out' : ''}`}>
+<<<<<<< HEAD
                     {audioBlocked && !userInteracted && (
                         <div className="audio-blocked-indicator">
                             <span className="audio-icon">🔊</span>
                             <span>Click anywhere to enable sound</span>
                         </div>
                     )}
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
                     <div className={`confirm-icon ${isUrgent ? 'urgent' : ''}`}>
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
@@ -580,6 +634,7 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
                     }
                 }
 
+<<<<<<< HEAD
                 .audio-blocked-indicator {
                     width: 100%;
                     padding: 12px 16px;
@@ -632,6 +687,8 @@ export default function Timer({ userId, lastConfirm, createdAt, onConfirm }) {
                     }
                 }
 
+=======
+>>>>>>> 88664ac2122aa3ef7983f7311236ee3cda1abd14
                 .confirm-icon {
                     width: 64px;
                     height: 64px;
