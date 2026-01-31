@@ -1,0 +1,71 @@
+[
+  {
+    "id": "universal",
+    "name": "Universal Classroom",
+    "description": "A classroom for everyone to join and interact",
+    "avatar": "🌍",
+    "password": null,
+    "createdBy": "system",
+    "createdAt": "2025-10-18T18:34:09.551Z",
+    "members": [
+      "mgqenl93",
+      "admin",
+      "mgvt66l2",
+      "mgqh22pw",
+      "mgv46s41",
+      "mgwc6al2",
+      "mh1sleqi",
+      "mh1snoxc",
+      "mh7ifxmr",
+      "mhkm46np",
+      "mi38wi80",
+      "mi38y4vx",
+      "mi8os9lk",
+      "ml28djs2",
+      "ml28h1k4",
+      "ml2dxe3k",
+      "ml2dzs5k",
+      "ml2dzseb"
+    ],
+    "isUniversal": true,
+    "settings": {
+      "allowAnonymous": true,
+      "maxMembers": 1000
+    }
+  },
+  {
+    "id": "mgwmyle482qusfahd6b",
+    "name": "Parhai",
+    "description": "Parhlo chahe kahi se, selection hoga yahise",
+    "avatar": "📚",
+    "createdBy": "mgqenl93",
+    "settings": {
+      "allowAnonymous": true,
+      "maxMembers": 100
+    },
+    "passwordHash": "$2a$08$bVP2W2/yte1oPrmohB.XQetl1LADI2ks43U0lNsN3TvxvY27yUocq",
+    "createdAt": "2025-10-18T18:53:30.738Z",
+    "members": [],
+    "isUniversal": false
+  },
+  {
+    "id": "mgwmz1y82lqlqfrhx5w",
+    "name": "Parhai1",
+    "description": "",
+    "avatar": "📚",
+    "createdBy": "mgqenl93",
+    "settings": {
+      "allowAnonymous": true,
+      "maxMembers": 100
+    },
+    "passwordHash": null,
+    "createdAt": "2025-10-18T18:53:52.160Z",
+    "members": [
+      "mgqenl93",
+      "mgqh22pw",
+      "admin",
+      "mgvt66l2"
+    ],
+    "isUniversal": false
+  }
+]

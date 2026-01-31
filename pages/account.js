@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import Router from 'next/router';
+import AccountButton from '../components/AccountButton';
+import MusicSelector from '../components/MusicSelector';
+import NotificationDemo from '../components/NotificationDemo';
 
 export default function Account() {
   const [me, setMe] = useState(null);
@@ -157,10 +160,22 @@ export default function Account() {
 
 
 
+  // Handle user updates from AccountButton
+  const handleUserUpdate = (updatedUser) => {
+    setMe(updatedUser);
+  };
+
+  // Handle music preference updates from MusicSelector
+  const handleMusicChange = (updatedUser) => {
+    setMe(updatedUser);
+  };
+
   if (!me) return null;
 
   return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+    <>
+      <AccountButton user={me} onUserUpdate={handleUserUpdate} />
+      <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
       <div className="card modern-card" style={{maxWidth:900,width:'100%',display:'flex',gap:32,padding:32,flexWrap:'wrap',alignItems:'flex-start'}}>
         <div style={{flex:'1 1 280px',minWidth:280}}>
           <h3 style={{marginTop:0,background:'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',fontSize:'24px',fontWeight:'700'}}>👤 Account</h3>
@@ -206,9 +221,17 @@ export default function Account() {
             </div>
 
             <div style={{marginTop:8, display:'flex', flexDirection:'column', gap:8}}>
-              <button className="btn" onClick={() => Router.push('/dashboard')} disabled={opBusy}>Back to Dashboard</button>
+              <button className="btn" onClick={() => Router.push('/dashboard')} disabled={opBusy}>Back to Universal Classroom</button>
               <button className="btn" onClick={handleLogout} disabled={opBusy}>Logout</button>
               <button className="btn" onClick={handleDeleteAccount} style={{background:'#ef4444'}} disabled={opBusy}>Delete account</button>
+            </div>
+
+            {/* Music Selection Section */}
+            <MusicSelector user={me} onMusicChange={handleMusicChange} />
+
+            {/* Notification Demo Section */}
+            <div style={{ marginTop: '24px' }}>
+              <NotificationDemo />
             </div>
           </div>
         </div>
@@ -255,5 +278,6 @@ export default function Account() {
         </div>
       </div>
     </div>
+    </>
   );
 }

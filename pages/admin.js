@@ -23,6 +23,14 @@ export default function Admin() {
         Router.push('/');
         return null;
       }
+      
+      // Check if user is admin (username is "admin")
+      if (data.user.name !== 'admin') {
+        // Not an admin, redirect to dashboard
+        Router.push('/dashboard');
+        return null;
+      }
+      
       setMe(data.user);
       return data.user;
     } catch (err) {
@@ -247,7 +255,7 @@ export default function Admin() {
       
       if (res.ok) {
         await fetchMe();
-        alert('⚡ Quick Test: Window opens in 10 seconds! Go to dashboard to see notifications.');
+        alert('⚡ Quick Test: Window opens in 10 seconds! Go to Universal Classroom to see notifications.');
       } else {
         const data = await res.json();
         alert(data.error || 'Failed to set quick test');
@@ -275,7 +283,7 @@ export default function Admin() {
       
       if (res.ok) {
         await fetchMe();
-        alert('🚀 Instant Window: Confirmation window is NOW OPEN! Go to dashboard immediately.');
+        alert('🚀 Instant Window: Confirmation window is NOW OPEN! Go to Universal Classroom immediately.');
       } else {
         const data = await res.json();
         alert(data.error || 'Failed to create instant window');
@@ -527,7 +535,7 @@ export default function Admin() {
               onClick={() => Router.push('/dashboard')}
               disabled={opBusy}
             >
-              Back to Dashboard
+              Back to Universal Classroom
             </button>
             <button 
               className="btn secondary" 
@@ -559,7 +567,7 @@ export default function Admin() {
                   const now = new Date();
                   const isInWindow = (now.getMinutes() === 0 || now.getMinutes() === 30) && now.getSeconds() < 60;
                   if (isInWindow) {
-                    alert('✅ Confirmation window is OPEN NOW! Go to dashboard to confirm.');
+        alert('✅ Confirmation window is OPEN NOW! Go to Universal Classroom to confirm.');
                   } else {
                     const nextWindow = now.getMinutes() < 30 ? ':30' : ':00 (next hour)';
                     alert(`⏳ No window currently open.\nNext window: ${nextWindow}`);
@@ -569,9 +577,77 @@ export default function Admin() {
               >
                 🔍 Check Current Status
               </button>
+              <button 
+                className="btn" 
+                onClick={async () => {
+                  if (opBusy) return;
+                  setOpBusy(true);
+                  try {
+                    const res = await fetch('/api/confirm', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId: me.id, clientTs: Date.now() })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      await fetchMe();
+                      // Show modern dialog instead of alert
+                      if (typeof window !== 'undefined' && window.showConfirmationDialog) {
+                        window.showConfirmationDialog({
+                          title: 'Test Confirmation Successful!',
+                          message: `Points Awarded: ${data.pointsAwarded}\nTotal Points: ${data.user.points}\nStreak: ${data.user.streak}\n\nThis bypasses the time window for testing purposes.`,
+                          type: 'success',
+                          confirmText: 'Great!',
+                          onConfirm: () => {},
+                          showCancel: false
+                        });
+                      }
+                    } else {
+                      if (typeof window !== 'undefined' && window.showConfirmationDialog) {
+                        window.showConfirmationDialog({
+                          title: 'Test Confirmation Failed',
+                          message: data.error || 'Unknown error',
+                          type: 'danger',
+                          confirmText: 'OK',
+                          onConfirm: () => {},
+                          showCancel: false
+                        });
+                      }
+                    }
+                  } catch (err) {
+                    console.error('Test confirm error', err);
+                    if (typeof window !== 'undefined' && window.showConfirmationDialog) {
+                      window.showConfirmationDialog({
+                        title: 'Network Error',
+                        message: 'Network error during test confirmation. Please check your connection.',
+                        type: 'danger',
+                        confirmText: 'OK',
+                        onConfirm: () => {},
+                        showCancel: false
+                      });
+                    }
+                  } finally {
+                    setOpBusy(false);
+                  }
+                }}
+                disabled={opBusy}
+                style={{ backgroundColor: '#8b5cf6', color: 'white' }}
+              >
+                🧪 Test Confirm (Bypass Time)
+              </button>
+              <button 
+                className="btn" 
+                onClick={() => {
+                  Router.push('/dashboard?testConfirm=true');
+                }}
+                disabled={opBusy}
+                style={{ backgroundColor: '#f59e0b', color: 'white' }}
+              >
+                🎯 Open Confirmation Window in Dashboard
+              </button>
             </div>
             <div className="admin-description" style={{ fontSize: '0.85rem', color: '#166534' }}>
-              <strong>New System:</strong> Confirmation windows sync to clock at :00 and :30 of every hour (60 seconds each)
+              <strong>New System:</strong> Confirmation windows sync to clock at :00 and :30 of every hour (60 seconds each). Use "Test Confirm" to test without waiting.
             </div>
           </div>
 
@@ -949,7 +1025,7 @@ export default function Admin() {
               <li><strong>Test Music:</strong> Use "Test Music" to verify audio playback works</li>
               <li><strong>Check Current Status:</strong> Use "Check Current Status" to see if a window is currently open</li>
               <li><strong>Wait for Next Window:</strong> Windows open at :00 and :30 of every hour</li>
-              <li><strong>Go to Dashboard:</strong> Switch to dashboard to see the countdown and experience notifications</li>
+              <li><strong>Go to Universal Classroom:</strong> Switch to Universal Classroom to see the countdown and experience notifications</li>
               <li><strong>Test Points & Streaks:</strong> Use the points testing section to simulate different scenarios</li>
             </ol>
             <div className="admin-tip" style={{ marginTop: '1rem', padding: '0.5rem', backgroundColor: '#fef3c7', borderRadius: '6px', fontSize: '0.85rem' }}>

@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST='{"classrooms.js -> ../components/ClassroomList":{"id":7544,"files":["static/chunks/544.126c770023f86ca1.js"]}}';

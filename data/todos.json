@@ -1,0 +1,22 @@
+[
+  {
+    "id": "ml28if6ocnz5a4nck7d",
+    "userId": "ml28djs2",
+    "classroomId": "universal",
+    "text": "Organic Chem Revision (12th)",
+    "completed": false,
+    "priority": "medium",
+    "createdAt": "2026-01-31T11:34:27.936Z",
+    "updatedAt": "2026-01-31T11:34:27.936Z"
+  },
+  {
+    "id": "ml2egsoicfz6hgqa1ds",
+    "userId": "test-user",
+    "classroomId": "test-classroom",
+    "text": "Test todo item",
+    "completed": false,
+    "priority": "high",
+    "createdAt": "2026-01-31T14:21:09.810Z",
+    "updatedAt": "2026-01-31T14:21:09.819Z"
+  }
+]

@@ -1,0 +1,474 @@
+/* Classroom Management System - Responsive Design Enhancements */
+
+/* ==========================================================================
+   Base Responsive Utilities
+   ========================================================================== */
+
+/* Ensure all elements use border-box sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll on mobile */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* ==========================================================================
+   Touch-Optimized Interactions
+   ========================================================================== */
+
+/* Enhanced touch targets for mobile devices */
+@media (hover: none) and (pointer: coarse) {
+  /* Buttons */
+  .btn,
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+
+  /* Remove hover effects on touch devices */
+  .btn:hover,
+  .card:hover,
+  .classroom-card:hover,
+  .lb-row:hover {
+    transform: none;
+  }
+
+  /* Add active states for better touch feedback */
+  .btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+
+  .card:active,
+  .classroom-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  /* Improve scrolling on touch devices */
+  .chat-messages,
+  .side-panel,
+  .classroom-list-container {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Input focus improvements */
+  .modern-input:focus,
+  .message-input:focus {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Mobile-First Responsive Breakpoints
+   ========================================================================== */
+
+/* Extra Small Devices (phones, 320px and up) */
+@media (max-width: 480px) {
+  /* Typography scaling */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+  h4 { font-size: 1rem; }
+
+  /* Spacing adjustments */
+  .container,
+  .classroom-list-container,
+  .classrooms-page {
+    padding: 12px;
+  }
+
+  /* Button improvements */
+  .btn {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .btn.large {
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  /* Input improvements - prevent zoom on iOS */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Modal improvements */
+  .modal-content {
+    margin: 8px;
+    padding: 16px;
+    max-width: calc(100vw - 16px);
+    border-radius: 16px;
+  }
+}
+
+/* Small Devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .classroom-list-container {
+    padding: 16px;
+  }
+
+  .classrooms-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Medium Devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .classrooms-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .dashboard-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .chat-panel {
+    order: 3;
+    align-self: center;
+    max-width: 500px;
+  }
+
+  .main-panel {
+    order: 1;
+  }
+
+  .side-panel {
+    order: 2;
+    width: 100%;
+    max-height: 400px;
+  }
+}
+
+/* Large Devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+  .dashboard-container {
+    flex-direction: row;
+    gap: 24px;
+  }
+
+  .chat-panel {
+    order: 1;
+    flex-shrink: 0;
+  }
+
+  .main-panel {
+    order: 2;
+    flex: 1;
+  }
+
+  .side-panel {
+    order: 3;
+    flex-shrink: 0;
+  }
+}
+
+/* ==========================================================================
+   Orientation-Specific Styles
+   ========================================================================== */
+
+/* Landscape orientation on mobile devices */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Reduce vertical spacing */
+  .classroom-dashboard {
+    padding: 8px;
+  }
+
+  .dashboard-container {
+    gap: 12px;
+  }
+
+  /* Adjust chat height */
+  .chat-box {
+    height: 280px;
+  }
+
+  /* Compact clock */
+  .clock-wrap {
+    width: 240px;
+  }
+
+  /* Move floating action button */
+  .settings-fab {
+    bottom: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Adjust account panel */
+  .account-panel {
+    top: 40px !important;
+    max-height: calc(100vh - 50px) !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Portrait orientation optimizations */
+@media (max-width: 768px) and (orientation: portrait) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .universal-classroom-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   Component-Specific Responsive Enhancements
+   ========================================================================== */
+
+/* Chat Box Responsive Enhancements */
+@media (max-width: 768px) {
+  .chat-box {
+    border-radius: 16px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .message-content {
+    max-width: 90%;
+    padding: 8px 12px;
+  }
+
+  .message-text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .message-input {
+    padding: 12px 16px;
+    border-radius: 16px;
+  }
+
+  .send-button {
+    border-radius: 16px;
+  }
+}
+
+/* Classroom List Responsive Enhancements */
+@media (max-width: 768px) {
+  .classroom-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .classroom-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .create-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+}
+
+/* Account Panel Responsive Enhancements */
+@media (max-width: 600px) {
+  .account-panel-overlay {
+    backdrop-filter: blur(4px) !important;
+  }
+
+  .account-panel {
+    border-radius: 16px !important;
+    box-shadow: var(--soft-shadow), 0 0 30px var(--theme-primary)15 !important;
+  }
+}
+
+/* Leaderboard Responsive Enhancements */
+@media (max-width: 768px) {
+  .lb-row {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .status-indicator {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* ==========================================================================
+   Accessibility Enhancements
+   ========================================================================== */
+
+/* Focus indicators for keyboard navigation */
+@media (prefers-reduced-motion: no-preference) {
+  .btn:focus,
+  .modern-input:focus,
+  .theme-btn:focus {
+    outline: 2px solid var(--theme-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .floating-element,
+  .clock-wrap::before,
+  .avatar::before {
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card,
+  .classroom-card,
+  .chat-box {
+    border-width: 2px;
+    border-color: var(--primary);
+  }
+
+  .btn {
+    border: 2px solid var(--theme-primary);
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+  .chat-box,
+  .settings-fab,
+  .account-panel,
+  .theme-selector,
+  .floating-element {
+    display: none !important;
+  }
+
+  .classroom-dashboard,
+  .classrooms-page {
+    background: white !important;
+    color: black !important;
+  }
+
+  .card,
+  .classroom-card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ==========================================================================
+   Performance Optimizations
+   ========================================================================== */
+
+/* GPU acceleration for smooth animations on mobile */
+@media (max-width: 768px) {
+  .chat-box,
+  .classroom-card,
+  .btn,
+  .clock-wrap {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
+/* Optimize scrolling performance */
+.chat-messages,
+.side-panel {
+  contain: layout style paint;
+}
+
+/* ==========================================================================
+   Dark Mode Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  :root.dark .chat-box,
+  :root.dark .classroom-card,
+  :root.dark .account-panel {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+
+  :root.dark .modal-content {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* ==========================================================================
+   Theme-Specific Mobile Optimizations
+   ========================================================================== */
+
+/* Pink theme mobile adjustments */
+@media (max-width: 768px) {
+  :root.pink .chat-box {
+    box-shadow: var(--soft-shadow), 0 0 30px rgba(236, 72, 153, 0.2);
+  }
+
+  :root.pink .classroom-card {
+    box-shadow: var(--soft-shadow), 0 0 25px rgba(236, 72, 153, 0.15);
+  }
+}
+
+/* Yellow theme mobile adjustments */
+@media (max-width: 768px) {
+  :root.yellow .chat-box {
+    box-shadow: var(--soft-shadow), 0 0 30px rgba(245, 158, 11, 0.2);
+  }
+
+  :root.yellow .classroom-card {
+    box-shadow: var(--soft-shadow), 0 0 25px rgba(245, 158, 11, 0.15);
+  }
+}
+
+/* Green theme mobile adjustments */
+@media (max-width: 768px) {
+  :root.green .chat-box {
+    box-shadow: var(--soft-shadow), 0 0 30px rgba(34, 197, 94, 0.2);
+  }
+
+  :root.green .classroom-card {
+    box-shadow: var(--soft-shadow), 0 0 25px rgba(34, 197, 94, 0.15);
+  }
+}
+
+/* Dark blue theme mobile adjustments */
+@media (max-width: 768px) {
+  :root.dark-blue .chat-box {
+    box-shadow: var(--soft-shadow), 0 0 30px rgba(59, 130, 246, 0.2);
+  }
+
+  :root.dark-blue .classroom-card {
+    box-shadow: var(--soft-shadow), 0 0 25px rgba(59, 130, 246, 0.15);
+  }
+}

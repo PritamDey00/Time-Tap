@@ -58,8 +58,13 @@ export default function Home() {
       return;
     }
     
-    // After register we just navigate to dashboard; login sets cookie server-side
-    router.push('/dashboard');
+    // Check if user is admin (username is "admin") and redirect accordingly
+    if (data.user && data.user.name === 'admin') {
+      router.push('/admin');
+    } else {
+      // After register we just navigate to classrooms; login sets cookie server-side
+      router.push('/classrooms');
+    }
   }
 
   function toggleMode() {

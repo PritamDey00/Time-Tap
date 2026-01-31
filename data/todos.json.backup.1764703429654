@@ -1,0 +1,63 @@
+[
+  {
+    "id": "mh7czulo1zkx55yvy44",
+    "userId": "test-user-1",
+    "classroomId": "classroom-1",
+    "text": "Updated test todo 1",
+    "completed": false,
+    "priority": "high",
+    "createdAt": "2025-10-26T07:00:01.068Z",
+    "updatedAt": "2025-10-26T07:00:01.094Z"
+  },
+  {
+    "id": "mh7czumslb3g5woz18i",
+    "userId": "test-user-2",
+    "classroomId": "classroom-1",
+    "text": "User 2 todo",
+    "completed": false,
+    "priority": "low",
+    "createdAt": "2025-10-26T07:00:01.108Z",
+    "updatedAt": "2025-10-26T07:00:01.108Z"
+  },
+  {
+    "id": "miag57gt4vzdhel8ckh",
+    "userId": "mgqenl93",
+    "classroomId": "universal",
+    "text": "Maths",
+    "completed": false,
+    "priority": "medium",
+    "createdAt": "2025-11-22T15:31:10.733Z",
+    "updatedAt": "2025-11-28T06:02:34.596Z"
+  },
+  {
+    "id": "miag5bxwd8o8jc2dy8t",
+    "userId": "mgqenl93",
+    "classroomId": "universal",
+    "text": "Physics",
+    "completed": false,
+    "priority": "medium",
+    "createdAt": "2025-11-22T15:31:16.532Z",
+    "updatedAt": "2025-11-28T06:02:35.937Z"
+  },
+  {
+    "id": "miag5hb6s93lnxeeg8p",
+    "userId": "mgqenl93",
+    "classroomId": "universal",
+    "text": "Chem",
+    "completed": false,
+    "priority": "medium",
+    "createdAt": "2025-11-22T15:31:23.490Z",
+    "updatedAt": "2025-11-28T06:02:33.745Z"
+  },
+  {
+    "id": "miag5p8c3wqbs6ajmvx",
+    "userId": "mgqenl93",
+    "classroomId": "universal",
+    "text": "English",
+    "completed": false,
+    "priority": "medium",
+    "createdAt": "2025-11-22T15:31:33.756Z",
+    "updatedAt": "2025-11-22T15:31:33.756Z"
+  }
+]
+]

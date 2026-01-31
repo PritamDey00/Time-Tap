@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Shortcut Interference Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .input-container {
+            margin: 10px 0;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .message-input, .todo-input, .form-input {
+            background: #f9f9f9;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .settings-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .settings-modal.show {
+            display: block;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.show {
+            display: block;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .test-log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Keyboard Shortcut Interference Fix Test</h1>
+    
+    <div class="instructions">
+        <h3>Test Instructions:</h3>
+        <p><strong>Press 'S' key</strong> to test the settings shortcut behavior:</p>
+        <ul>
+            <li>When typing in any input field below, pressing 'S' should <strong>NOT</strong> open settings</li>
+            <li>When clicking outside input fields and pressing 'S', settings <strong>SHOULD</strong> open</li>
+            <li>Press 'Escape' to close settings (works even when typing)</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>Chat Input Test</h3>
+        <div class="input-container">
+            <input type="text" class="message-input" placeholder="Type a message... (try pressing 'S')" />
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Todo Input Test</h3>
+        <div class="input-container">
+            <input type="text" class="todo-input" placeholder="Add a new todo... (try pressing 'S')" />
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Form Input Test</h3>
+        <form class="form-group">
+            <div class="input-container">
+                <input type="text" class="form-input" placeholder="Form input... (try pressing 'S')" />
+            </div>
+            <div class="input-container">
+                <textarea class="form-textarea" placeholder="Form textarea... (try pressing 'S')" rows="3"></textarea>
+            </div>
+        </form>
+    </div>
+
+    <div class="test-section">
+        <h3>Search Input Test</h3>
+        <div class="search-container">
+            <input type="text" class="search-input modern-input" placeholder="Search... (try pressing 'S')" />
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>ContentEditable Test</h3>
+        <div contenteditable="true" style="border: 1px solid #ddd; padding: 10px; min-height: 50px;">
+            Click here and type... (try pressing 'S')
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Non-Input Area Test</h3>
+        <p>Click here (outside any input) and press 'S' - settings should open</p>
+        <button onclick="testKeyboardShortcut()">Test 'S' Key Programmatically</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div id="testLog" class="test-log"></div>
+
+    <!-- Settings Modal -->
+    <div id="overlay" class="overlay" onclick="closeSettings()"></div>
+    <div id="settingsModal" class="settings-modal">
+        <h3>Settings Modal</h3>
+        <p>This modal opened because 'S' was pressed outside an input context.</p>
+        <button onclick="closeSettings()">Close Settings</button>
+        <p><small>You can also press 'Escape' to close</small></p>
+    </div>
+
+    <script>
+        let testLog = [];
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            testLog.push(`[${timestamp}] ${message}`);
+            document.getElementById('testLog').innerHTML = testLog.slice(-10).join('\n');
+        }
+        
+        function showStatus(message, isSuccess) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${isSuccess ? 'success' : 'error'}`;
+        }
+        
+        function openSettings() {
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('settingsModal').classList.add('show');
+            log('Settings modal opened');
+            showStatus('✅ Settings opened successfully', true);
+        }
+        
+        function closeSettings() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('settingsModal').classList.remove('show');
+            log('Settings modal closed');
+            showStatus('Settings closed', true);
+        }
+        
+        function testKeyboardShortcut() {
+            // Simulate the improved keyboard shortcut logic
+            const event = new KeyboardEvent('keydown', { key: 'S' });
+            document.dispatchEvent(event);
+        }
+        
+        // Improved keyboard shortcut logic (same as implemented in the fix)
+        function isTypingInInput(target) {
+            const tagName = target.tagName?.toLowerCase();
+            
+            // Check for standard input elements
+            if (tagName === 'input' || tagName === 'textarea') {
+                return true;
+            }
+            
+            // Check for contentEditable elements
+            if (target.contentEditable === 'true' || target.isContentEditable) {
+                return true;
+            }
+            
+            // Check if target is inside a form or input container
+            const isInFormContext = target.closest('form, .input-container, .todo-form, .chat-input-form, .form-group, .search-container');
+            if (isInFormContext) {
+                return true;
+            }
+            
+            // Check for elements with input-related classes
+            const inputClasses = [
+                'message-input', 'todo-input', 'todo-edit-input', 'form-input', 
+                'form-textarea', 'search-input', 'modern-input', 'avatar-input'
+            ];
+            if (inputClasses.some(className => target.classList?.contains(className))) {
+                return true;
+            }
+            
+            // Check if any input element currently has focus
+            const activeElement = document.activeElement;
+            if (activeElement && (
+                activeElement.tagName?.toLowerCase() === 'input' ||
+                activeElement.tagName?.toLowerCase() === 'textarea' ||
+                activeElement.contentEditable === 'true' ||
+                activeElement.isContentEditable
+            )) {
+                return true;
+            }
+            
+            // Check for role-based input elements
+            const inputRoles = ['textbox', 'searchbox', 'combobox'];
+            if (inputRoles.includes(target.getAttribute('role'))) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        // Keyboard event handler
+        document.addEventListener('keydown', function(e) {
+            log(`Key pressed: ${e.key} on ${e.target.tagName || 'document'} (class: ${e.target.className || 'none'})`);
+            
+            if (!isTypingInInput(e.target)) {
+                if (e.key === 's' || e.key === 'S') {
+                    e.preventDefault();
+                    openSettings();
+                    log('✅ Settings shortcut activated (not in input context)');
+                }
+            } else {
+                if (e.key === 's' || e.key === 'S') {
+                    log('🚫 Settings shortcut blocked (in input context)');
+                    showStatus('✅ Shortcut correctly blocked while typing', true);
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeSettings();
+            }
+        });
+        
+        // Focus event logging
+        document.addEventListener('focus', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.contentEditable === 'true') {
+                log(`Focus on: ${e.target.tagName} (class: ${e.target.className || 'none'})`);
+            }
+        }, true);
+        
+        log('Test page loaded. Try pressing "S" in different contexts.');
+    </script>
+</body>
+</html>

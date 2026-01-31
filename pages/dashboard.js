@@ -1,16 +1,19 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import Head from 'next/head';
 import Router from 'next/router';
 import AnalogClock from '../components/AnalogClock';
 import Timer from '../components/Timer';
 import Leaderboard from '../components/Leaderboard';
+import TodoList from '../components/TodoList';
+import AccountButton from '../components/AccountButton';
+import { useLeaderboardData } from '../lib/useLeaderboardPersistence';
 
-export default function Dashboard() {
+export default function UniversalClassroom() {
   const [me, setMe] = useState(null);
   const [users, setUsers] = useState([]);
   const [loadingMe, setLoadingMe] = useState(true);
   const [opBusy, setOpBusy] = useState(false);
   const [theme, setTheme] = useState('light');
-  const refetch = useRef(null);
 
   // Fetch current user (uses auth cookie set by /api/login)
   async function fetchMe() {
@@ -35,7 +38,8 @@ export default function Dashboard() {
 
   async function fetchUsers() {
     try {
-      const res = await fetch('/api/users');
+      // Use the universal classroom users endpoint to get only joined members
+      const res = await fetch('/api/classrooms/universal/users');
       const j = await res.json();
       setUsers(j.users || []);
     } catch (err) {
@@ -80,6 +84,18 @@ export default function Dashboard() {
     }
   }
 
+  // Use the leaderboard persistence hook for better state management
+  const { forceRefresh: refreshLeaderboard } = useLeaderboardData(
+    fetchUsers,
+    {
+      interval: 8000,
+      sendHeartbeat,
+      onError: (error) => {
+        console.error('Leaderboard persistence error:', error);
+      }
+    }
+  );
+
   useEffect(() => {
     (async () => {
       const user = await fetchMe();
@@ -87,7 +103,7 @@ export default function Dashboard() {
       if (user) {
         // pass server timezone (might be null) so detectAndSaveTimezone will only persist when needed
         await detectAndSaveTimezone(user.timezone || null);
-        
+
         // Send initial heartbeat
         await sendHeartbeat();
       }
@@ -111,13 +127,12 @@ export default function Dashboard() {
       }
     }
 
-    // refresh leaderboard periodically and send heartbeat
-    refetch.current = setInterval(() => {
-      fetchUsers();
-      sendHeartbeat();
-    }, 8000);
-    
-    return () => clearInterval(refetch.current);
+    // The leaderboard persistence is now handled by the useLeaderboardData hook
+    // No need for manual interval management here
+
+    return () => {
+      // Cleanup is handled by the hook
+    };
   }, []);
 
   // Called when user presses Confirm during the 1-minute window
@@ -131,7 +146,7 @@ export default function Dashboard() {
       } else {
         // refresh me and leaderboard to reflect points/streak update
         await fetchMe();
-        await fetchUsers();
+        refreshLeaderboard();
       }
     } catch (err) {
       console.error('confirm error', err);
@@ -143,13 +158,13 @@ export default function Dashboard() {
 
   function applyTheme(t) {
     if (typeof document === 'undefined') return;
-    
+
     // Remove all theme classes
     const themeClasses = ['dark', 'dark-blue', 'pink', 'yellow', 'green'];
     themeClasses.forEach(theme => {
       document.documentElement.classList.remove(theme);
     });
-    
+
     // Add the selected theme class (except for light which is default)
     if (t !== 'light') {
       document.documentElement.classList.add(t);
@@ -165,14 +180,7 @@ export default function Dashboard() {
     { id: 'green', name: 'Nature', icon: '🌿' }
   ];
 
-  function toggleTheme() {
-    const currentIndex = themes.findIndex(t => t.id === theme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    const nextTheme = themes[nextIndex].id;
-    setTheme(nextTheme);
-    localStorage.setItem('theme', nextTheme);
-    applyTheme(nextTheme);
-  }
+
 
   function setSpecificTheme(themeId) {
     setTheme(themeId);
@@ -184,128 +192,849 @@ export default function Dashboard() {
 
   if (loadingMe || !me) return null;
 
+  // Handle user updates from AccountButton
+  const handleUserUpdate = (updatedUser) => {
+    setMe(updatedUser);
+  };
+
   // Use server timezone if present, otherwise default to Asia/Kolkata (India)
   const timeZone = me.timezone || 'Asia/Kolkata';
 
   return (
-    <div className="container">
-      <main className="main-panel card" aria-live="polite">
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div className="clock-wrap" aria-hidden={false}>
-            <AnalogClock timeZone={timeZone} />
-          </div>
+    <>
+      <Head>
+        <title>Universal Classroom - Study Together</title>
+        <meta name="description" content="Join the Universal Classroom - A global study space where students connect and learn together" />
+      </Head>
+      <AccountButton user={me} onUserUpdate={handleUserUpdate} />
+      <div className="dashboard-container">
+        {/* Left Panel - Todo List */}
+        <aside className="left-panel" role="complementary" aria-label="Todo List Panel">
+          <section className="todo-panel card" aria-labelledby="todo-title" role="region">
+            <TodoList
+              userId={me?.id}
+              classroomId="universal"
+              className="universal-todo-list"
+            />
+          </section>
+        </aside>
 
-          <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-            <Timer lastConfirm={me.lastConfirm} createdAt={me.createdAt} onConfirm={handleConfirm} />
-
-            <div style={{ marginTop: 12, color: 'var(--muted)', fontSize: 13, textAlign: 'center', padding: '0 8px' }}>
-              Signed in as <strong>{me.name}</strong> — Points: <strong>{me.points}</strong> • Streak: <strong>{me.streak}</strong>
+        {/* Center Panel - Clock and Timer */}
+        <main className="center-panel card" aria-live="polite" role="main" aria-label="Clock and Timer Section">
+          <div className="main-content">
+            <div className="clock-wrap" aria-hidden={false}>
+              <AnalogClock timeZone={timeZone} />
             </div>
 
-            {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
-              <div style={{ marginTop: 8, padding: '8px 12px', backgroundColor: '#fef3c7', color: '#92400e', borderRadius: '6px', fontSize: '12px', textAlign: 'center', maxWidth: '90vw', margin: '8px auto 0' }}>
-                <strong>⚠️ Enable notifications</strong> to get alerts when confirmation window opens!
-                <button 
-                  onClick={() => Notification.requestPermission()} 
-                  style={{ marginLeft: '8px', padding: '2px 8px', fontSize: '11px', backgroundColor: '#d97706', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  Enable
-                </button>
-              </div>
-            )}
+            <div className="timer-section">
+              <Timer lastConfirm={me.lastConfirm} createdAt={me.createdAt} onConfirm={handleConfirm} />
 
-            <div style={{ marginTop: 20, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-              <button className="btn secondary" onClick={() => Router.push('/account')} disabled={opBusy}>
-                👤 Account
-              </button>
-              
-              {/* Theme Selector */}
-              <div style={{ 
-                display: 'flex', 
-                gap: 4, 
-                padding: '4px', 
-                background: 'var(--glass)', 
-                borderRadius: '12px',
-                border: '1px solid var(--glass-border)',
-                backdropFilter: 'blur(10px)'
-              }}>
-                {themes.map(t => (
-                  <button
-                    key={t.id}
-                    onClick={() => setSpecificTheme(t.id)}
-                    disabled={opBusy}
-                    style={{
-                      padding: '8px 10px',
-                      border: 'none',
-                      borderRadius: '8px',
-                      background: theme === t.id ? 'var(--theme-primary)' : 'transparent',
-                      color: theme === t.id ? 'white' : 'var(--primary)',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                    title={t.name}
-                  >
-                    {t.icon}
+              <div className="user-info">
+                Signed in as <strong>{me.name}</strong> — Points: <strong>{me.points}</strong> • Streak: <strong>{me.streak}</strong>
+              </div>
+
+              {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
+                <div className="notification-banner">
+                  <strong>⚠️ Enable notifications & microphone</strong> to get alerts when confirmation window opens!
+                  <button onClick={async () => {
+                    // Request notification permission
+                    await Notification.requestPermission();
+                    
+                    // Also request microphone permission for convenience
+                    try {
+                      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        await navigator.mediaDevices.getUserMedia({ audio: true });
+                        console.log('Microphone permission granted');
+                      }
+                    } catch (error) {
+                      console.log('Microphone permission denied or not available:', error);
+                      // Don't show error to user - microphone is optional
+                    }
+                  }}>
+                    Enable
                   </button>
-                ))}
+                </div>
+              )}
+
+              <div className="btn-group">
+                <button className="btn secondary" onClick={() => Router.push('/classrooms')} disabled={opBusy}>
+                  🏫 Classrooms
+                </button>
+
+                <button className="btn secondary" onClick={() => Router.push('/account')} disabled={opBusy}>
+                  👤 Account
+                </button>
+
+                {/* Theme Selector */}
+                <div className="theme-selector">
+                  {themes.map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => setSpecificTheme(t.id)}
+                      disabled={opBusy}
+                      className={`theme-btn ${theme === t.id ? 'active' : ''}`}
+                      title={t.name}
+                    >
+                      {t.icon}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      <aside className="side-panel card modern-sidebar" aria-label="Leaderboard">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '4px 0 16px' }}>
-          <h4 style={{ 
-            margin: 0, 
-            background: 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            fontSize: '18px',
-            fontWeight: '700'
-          }}>
-            🏆 Leaderboard
-          </h4>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 6,
-            padding: '4px 8px',
-            background: 'var(--card-secondary)',
-            borderRadius: '8px',
-            border: '1px solid var(--glass-border)'
-          }}>
-            <div style={{ 
-              width: 8, 
-              height: 8, 
-              borderRadius: '50%', 
-              backgroundColor: '#10b981',
-              boxShadow: '0 0 8px rgba(16, 185, 129, 0.5)'
-            }} title="Online" />
-            <div style={{ 
-              width: 8, 
-              height: 8, 
-              borderRadius: '50%', 
-              backgroundColor: '#f59e0b',
-              boxShadow: '0 0 8px rgba(245, 158, 11, 0.5)'
-            }} title="Away" />
-            <div style={{ 
-              width: 8, 
-              height: 8, 
-              borderRadius: '50%', 
-              backgroundColor: '#6b7280',
-              boxShadow: '0 0 8px rgba(107, 114, 128, 0.3)'
-            }} title="Offline" />
-          </div>
-        </div>
-        <Leaderboard users={users} me={me} />
-      </aside>
-    </div>
+        {/* Right Panel - Leaderboard */}
+        <aside className="right-panel" role="complementary" aria-label="Leaderboard Panel">
+          <section className="leaderboard-panel card modern-sidebar leaderboard-persistent" aria-labelledby="leaderboard-title" role="region">
+            <div className="leaderboard-header">
+              <h4 id="leaderboard-title" className="leaderboard-title">
+                🏆 Universal Leaderboard
+              </h4>
+              <div className="status-legend">
+                <div className="status-dot online" title="Online" />
+                <div className="status-dot away" title="Away" />
+                <div className="status-dot offline" title="Offline" />
+              </div>
+            </div>
+            <div className="leaderboard-container">
+              <Leaderboard users={users} me={me} maxHeight="100%" />
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <style jsx>{`
+      .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 350px 1fr 450px;
+        gap: 32px;
+        align-items: start;
+        padding: 24px;
+        min-height: 100vh;
+      }
+
+      /* Left Panel - Todo List */
+      .left-panel {
+        grid-column: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Center Panel - Clock Section */
+      .center-panel {
+        grid-column: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        min-height: 600px;
+      }
+
+      .main-content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .clock-wrap {
+        width: 400px;
+        max-width: 90vw;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 2px solid var(--glass-border);
+        box-shadow: var(--soft-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .clock-wrap::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(from 0deg, var(--theme-primary)20, var(--theme-secondary)20, var(--theme-accent)20, var(--theme-primary)20);
+        animation: rotate 20s linear infinite;
+        z-index: -1;
+      }
+
+      .clock-wrap::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border-radius: 50%;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        z-index: -1;
+      }
+
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      .clock-wrap:hover {
+        transform: scale(1.02);
+        box-shadow: var(--soft-shadow), 0 0 40px var(--theme-primary)30, inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .timer-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 24px;
+        gap: 16px;
+      }
+
+      .user-info {
+        color: var(--muted);
+        font-size: 14px;
+        text-align: center;
+        padding: 0 8px;
+      }
+
+      .notification-banner {
+        padding: 12px 16px;
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        border-radius: 12px;
+        font-size: 13px;
+        text-align: center;
+        max-width: 400px;
+        color: var(--warning-color, #d97706);
+      }
+
+      .notification-banner button {
+        margin-left: 8px;
+        padding: 4px 12px;
+        font-size: 12px;
+        background: var(--warning-color, #d97706);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .notification-banner button:hover {
+        background: var(--warning-color-dark, #b45309);
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .theme-selector {
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        background: var(--glass);
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+      }
+
+      .theme-btn {
+        padding: 8px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--primary);
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+      }
+
+      .theme-btn.active {
+        background: var(--theme-primary);
+        color: white;
+      }
+
+      .theme-btn:hover:not(.active) {
+        background: var(--card-secondary);
+      }
+
+      .theme-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Right Panel - Leaderboard */
+      .right-panel {
+        grid-column: 3;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-width: 400px;
+      }
+
+      /* Todo Panel */
+      .todo-panel {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        min-height: 400px;
+      }
+
+      /* Leaderboard Panel */
+      .leaderboard-panel {
+        min-width: 400px;
+        max-height: 600px;
+        overflow: hidden;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .leaderboard-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 16px 0;
+        flex-shrink: 0;
+      }
+
+      .leaderboard-title {
+        margin: 0;
+        background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .status-legend {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        background: var(--card-secondary);
+        border-radius: 8px;
+        border: 1px solid var(--glass-border);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      .status-dot.online {
+        background-color: var(--success-color, #10b981);
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+      }
+
+      .status-dot.away {
+        background-color: var(--warning-color, #f59e0b);
+        box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+      }
+
+      .status-dot.offline {
+        background-color: var(--muted);
+        box-shadow: 0 0 8px var(--muted)50;
+      }
+
+      /* Leaderboard container for proper alignment */
+      .leaderboard-container {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* Ensure no double scrollbars */
+      .side-panel :global(.leaderboard-unified-scroll) {
+        height: 100%;
+        max-height: none;
+      }
+
+      /* Fix alignment issues */
+      .left-panel section,
+      .right-panel section {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .todo-panel,
+      .leaderboard-panel {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Ensure consistent spacing and alignment */
+      .left-panel > section,
+      .right-panel > section,
+      .center-panel {
+        border-radius: 16px;
+        box-shadow: var(--soft-shadow);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--glass-border);
+      }
+
+      /* Remove any margin/padding inconsistencies */
+      .left-panel > section > *,
+      .right-panel > section > * {
+        margin: 0;
+      }
+
+      /* Ensure proper content alignment */
+      .leaderboard-panel .leaderboard-container {
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Perfect alignment for leaderboard content */
+      .leaderboard-panel :global(.leaderboard-content) {
+        padding: 0;
+        margin: 0;
+      }
+
+      /* Ensure scroll container takes full available space */
+      .leaderboard-container :global(.leaderboard-unified-scroll) {
+        flex: 1;
+        min-height: 0;
+      }
+
+      /* Responsive Design - Desktop Large */
+      @media (min-width: 1200px) {
+        .dashboard-container {
+          grid-template-columns: 350px 1fr 450px;
+          gap: 40px;
+          padding: 32px;
+          max-width: 1400px;
+        }
+
+        .right-panel {
+          width: 450px;
+        }
+
+        .left-panel {
+          width: 350px;
+        }
+
+        .clock-wrap {
+          width: 420px;
+        }
+
+        .center-panel {
+          padding: 40px;
+        }
+
+        .todo-panel {
+          padding: 20px;
+          min-height: 450px;
+        }
+
+        .leaderboard-panel {
+          padding: 20px;
+          max-height: 650px;
+          overflow: hidden;
+        }
+
+        .leaderboard-title {
+          font-size: 20px;
+        }
+      }
+
+      /* Responsive Design - Tablet */
+      @media (min-width: 769px) and (max-width: 1199px) {
+        .dashboard-container {
+          grid-template-columns: 300px 1fr 400px;
+          gap: 28px;
+          padding: 24px 20px;
+        }
+
+        .right-panel {
+          width: 400px;
+          min-width: 350px;
+        }
+
+        .left-panel {
+          width: 300px;
+        }
+
+        .todo-panel {
+          padding: 18px;
+          min-height: 380px;
+        }
+
+        .leaderboard-panel {
+          min-width: 350px;
+          padding: 18px;
+          max-height: 500px;
+          overflow: hidden;
+        }
+
+        .center-panel {
+          padding: 32px;
+        }
+
+        .clock-wrap {
+          width: 380px;
+        }
+
+        .leaderboard-title {
+          font-size: 18px;
+        }
+      }
+
+      /* Responsive Design - Small Tablet */
+      @media (min-width: 601px) and (max-width: 768px) {
+        .dashboard-container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          padding: 20px;
+        }
+
+        .center-panel {
+          order: 1;
+          width: 100%;
+          padding: 28px;
+        }
+
+        .left-panel {
+          order: 2;
+          width: 100%;
+        }
+
+        .right-panel {
+          order: 3;
+          width: 100%;
+        }
+
+        .todo-panel {
+          max-height: 300px;
+          padding: 16px;
+        }
+
+        .leaderboard-panel {
+          max-height: 380px;
+          overflow: hidden;
+          padding: 16px;
+        }
+
+        .clock-wrap {
+          width: 360px;
+          max-width: 90vw;
+        }
+      }
+
+      /* Responsive Design - Mobile */
+      @media (max-width: 600px) {
+        .dashboard-container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          align-items: center;
+          padding: 16px;
+        }
+
+        .center-panel {
+          order: 1;
+          width: 100%;
+          padding: 20px;
+        }
+
+        .right-panel {
+          order: 2;
+          width: 100%;
+        }
+
+        .left-panel {
+          order: 3;
+          width: 100%;
+        }
+
+        .leaderboard-panel {
+          max-height: 320px;
+          padding: 16px;
+          overflow: hidden;
+        }
+
+        .todo-panel {
+          width: 100%;
+          padding: 16px;
+          min-height: 250px;
+        }
+
+        .clock-wrap {
+          width: 320px;
+          max-width: 90vw;
+        }
+
+        .leaderboard-title {
+          font-size: 16px;
+        }
+      }
+
+      /* Responsive Design - Small Mobile */
+      @media (max-width: 480px) {
+        .dashboard-container {
+          padding: 12px;
+          gap: 16px;
+        }
+
+        .center-panel {
+          padding: 16px;
+        }
+
+        .clock-wrap {
+          width: 280px;
+          max-width: 95vw;
+          padding: 20px;
+        }
+
+        .leaderboard-panel {
+          padding: 14px;
+          max-height: 280px;
+          overflow: hidden;
+        }
+
+        .todo-panel {
+          padding: 14px;
+          min-height: 200px;
+        }
+
+        .btn-group {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn-group > * {
+          width: 100%;
+          max-width: 280px;
+        }
+
+        .theme-selector {
+          justify-content: center;
+          padding: 6px;
+        }
+
+        .theme-btn {
+          min-width: 40px;
+          min-height: 40px;
+          padding: 8px;
+          font-size: 12px;
+        }
+
+        .user-info {
+          font-size: 12px;
+          padding: 0 8px;
+        }
+
+        .leaderboard-title {
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 320px) {
+        .dashboard-container {
+          padding: 8px;
+        }
+
+        .center-panel {
+          padding: 16px;
+        }
+
+        .clock-wrap {
+          width: 280px;
+          padding: 20px;
+        }
+
+        .user-info {
+          font-size: 12px;
+          padding: 0 12px;
+        }
+
+        .leaderboard-panel {
+          padding: 12px;
+          max-height: 250px;
+          overflow: hidden;
+        }
+
+        .todo-panel {
+          padding: 12px;
+          min-height: 180px;
+        }
+
+        .leaderboard-title {
+          font-size: 14px;
+        }
+
+        .theme-btn {
+          min-width: 40px;
+          min-height: 40px;
+          padding: 8px;
+          font-size: 12px;
+        }
+      }
+
+      /* Theme-specific card styling */
+      :global(.dark) .card {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(71, 85, 105, 0.4);
+        backdrop-filter: blur(20px);
+      }
+
+      :global(.dark-blue) .card {
+        background: rgba(30, 58, 138, 0.2);
+        border-color: rgba(59, 130, 246, 0.3);
+        backdrop-filter: blur(20px);
+      }
+
+      :global(.pink) .card {
+        background: rgba(252, 231, 243, 0.9);
+        border-color: rgba(236, 72, 153, 0.25);
+        backdrop-filter: blur(15px);
+      }
+
+      :global(.yellow) .card {
+        background: rgba(254, 243, 199, 0.9);
+        border-color: rgba(245, 158, 11, 0.25);
+        backdrop-filter: blur(15px);
+      }
+
+      :global(.green) .card {
+        background: rgba(220, 252, 231, 0.9);
+        border-color: rgba(34, 197, 94, 0.25);
+        backdrop-filter: blur(15px);
+      }
+
+      /* Theme-specific clock styling */
+      :global(.dark) .clock-wrap {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(71, 85, 105, 0.5);
+      }
+
+      :global(.dark-blue) .clock-wrap {
+        background: rgba(30, 58, 138, 0.3);
+        border-color: rgba(59, 130, 246, 0.4);
+      }
+
+      :global(.pink) .clock-wrap {
+        background: rgba(252, 231, 243, 0.8);
+        border-color: rgba(236, 72, 153, 0.3);
+      }
+
+      :global(.yellow) .clock-wrap {
+        background: rgba(254, 243, 199, 0.8);
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+
+      :global(.green) .clock-wrap {
+        background: rgba(220, 252, 231, 0.8);
+        border-color: rgba(34, 197, 94, 0.3);
+      }
+
+      /* Touch-specific optimizations */
+      @media (hover: none) and (pointer: coarse) {
+        .clock-wrap:hover {
+          transform: none;
+        }
+
+        .theme-btn:hover {
+          background: var(--card-secondary);
+        }
+
+        .theme-btn:active {
+          transform: scale(0.95);
+        }
+
+        .btn:hover {
+          transform: none;
+        }
+
+        .btn:active {
+          transform: scale(0.95);
+        }
+      }
+
+      /* Mobile landscape optimization */
+      @media (max-width: 768px) and (orientation: landscape) {
+        .dashboard-container {
+          display: grid;
+          grid-template-columns: 280px 1fr 300px;
+          gap: 16px;
+          padding: 8px;
+          min-height: 100vh;
+        }
+
+        .left-panel {
+          grid-column: 1;
+        }
+
+        .center-panel {
+          grid-column: 2;
+          padding: 16px;
+        }
+
+        .right-panel {
+          grid-column: 3;
+        }
+
+        .todo-panel {
+          padding: 12px;
+          min-height: 200px;
+        }
+
+        .leaderboard-panel {
+          max-height: 200px;
+          overflow: hidden;
+          padding: 12px;
+        }
+
+        .clock-wrap {
+          width: 260px;
+        }
+      }
+
+      /* Touch-friendly mobile enhancements */
+      @media (max-width: 768px) {
+        .left-panel,
+        .right-panel {
+          padding: 0 8px;
+        }
+
+        .leaderboard-panel,
+        .todo-panel {
+          border-radius: 16px;
+          padding: 20px;
+        }
+
+        /* Ensure touch targets are at least 44px */
+        .btn, .theme-btn {
+          min-height: 44px;
+          min-width: 44px;
+        }
+
+        /* Improve scroll area for touch */
+        .leaderboard-unified-scroll {
+          padding: 4px;
+        }
+      }
+    `}</style>
+    </>
   );
 }

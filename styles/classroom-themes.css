@@ -1,0 +1,466 @@
+/* Classroom Management System - Theme Consistency Enhancements */
+
+/* ==========================================================================
+   Theme Variable Extensions for Classroom Components
+   ========================================================================== */
+
+/* Ensure all themes have consistent classroom-specific variables */
+:root {
+  /* Classroom-specific theme extensions */
+  --classroom-glow: var(--theme-primary)15;
+  --classroom-border: var(--theme-primary)30;
+  --classroom-hover: var(--theme-primary)20;
+  --classroom-active: var(--theme-primary)40;
+  
+  /* Chat-specific theme variables */
+  --chat-own-message: var(--theme-primary)20;
+  --chat-own-border: var(--theme-primary)30;
+  --chat-accent: var(--theme-primary);
+  
+  /* Anonymous mode theme variables */
+  --anonymous-bg: var(--theme-accent)20;
+  --anonymous-border: var(--theme-accent)30;
+  --anonymous-text: var(--theme-accent);
+  
+  /* Status and feedback colors */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #dc2626;
+  --info-color: var(--theme-primary);
+}
+
+/* Dark theme extensions */
+:root.dark {
+  --classroom-glow: var(--theme-primary)10;
+  --classroom-border: var(--theme-primary)25;
+  --classroom-hover: var(--theme-primary)15;
+  --classroom-active: var(--theme-primary)35;
+}
+
+/* Dark blue theme extensions */
+:root.dark-blue {
+  --classroom-glow: var(--theme-primary)12;
+  --classroom-border: var(--theme-primary)28;
+  --classroom-hover: var(--theme-primary)18;
+  --classroom-active: var(--theme-primary)38;
+}
+
+/* Pink theme extensions */
+:root.pink {
+  --classroom-glow: var(--theme-primary)18;
+  --classroom-border: var(--theme-primary)32;
+  --classroom-hover: var(--theme-primary)22;
+  --classroom-active: var(--theme-primary)42;
+}
+
+/* Yellow theme extensions */
+:root.yellow {
+  --classroom-glow: var(--theme-primary)16;
+  --classroom-border: var(--theme-primary)30;
+  --classroom-hover: var(--theme-primary)20;
+  --classroom-active: var(--theme-primary)40;
+}
+
+/* Green theme extensions */
+:root.green {
+  --classroom-glow: var(--theme-primary)17;
+  --classroom-border: var(--theme-primary)31;
+  --classroom-hover: var(--theme-primary)21;
+  --classroom-active: var(--theme-primary)41;
+}
+
+/* ==========================================================================
+   Consistent Component Styling Across All Themes
+   ========================================================================== */
+
+/* Classroom Cards - Consistent across all themes */
+.classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 30px var(--classroom-glow);
+  border-color: var(--glass-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.classroom-card:hover {
+  box-shadow: var(--soft-shadow), 0 0 40px var(--classroom-hover);
+  border-color: var(--classroom-border);
+}
+
+.classroom-card::before {
+  background: linear-gradient(90deg, transparent, var(--theme-primary), var(--theme-secondary), transparent);
+}
+
+/* Chat Box - Consistent across all themes */
+.chat-box {
+  box-shadow: var(--soft-shadow), 0 0 25px var(--classroom-glow);
+}
+
+.chat-box:hover {
+  box-shadow: var(--soft-shadow), 0 0 35px var(--classroom-hover);
+  border-color: var(--classroom-border);
+}
+
+.chat-box::before {
+  background: linear-gradient(90deg, transparent, var(--theme-primary), var(--theme-secondary), transparent);
+}
+
+/* Own messages in chat */
+.message.own .message-content {
+  background: linear-gradient(135deg, var(--chat-own-message), var(--theme-secondary)20);
+  border-color: var(--chat-own-border);
+}
+
+/* Account Panel - Consistent across all themes */
+.account-panel {
+  box-shadow: var(--soft-shadow), 0 0 40px var(--classroom-hover);
+}
+
+/* Anonymous mode styling */
+.anonymous-badge,
+.stat.anonymous,
+.anonymous-indicator {
+  background: linear-gradient(135deg, var(--anonymous-bg), var(--theme-primary)20);
+  border-color: var(--anonymous-border);
+  color: var(--anonymous-text);
+}
+
+/* Universal classroom styling */
+.universal-classroom-card,
+.stat.universal {
+  background: linear-gradient(135deg, var(--theme-accent)20, var(--theme-primary)20);
+  border-color: var(--theme-accent)30;
+}
+
+.classroom-avatar.universal {
+  background: linear-gradient(135deg, var(--theme-accent), var(--theme-primary));
+  box-shadow: 0 8px 25px var(--theme-accent)40;
+}
+
+/* ==========================================================================
+   Theme-Specific Enhancements
+   ========================================================================== */
+
+/* Light theme specific enhancements */
+:root:not(.dark):not(.dark-blue):not(.pink):not(.yellow):not(.green) .classroom-card,
+:root:not(.dark):not(.dark-blue):not(.pink):not(.yellow):not(.green) .chat-box {
+  /* Enhanced light theme classroom styling with better contrast */
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+:root:not(.dark):not(.dark-blue):not(.pink):not(.yellow):not(.green) .classroom-card {
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+
+:root:not(.dark):not(.dark-blue):not(.pink):not(.yellow):not(.green) .chat-box {
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+
+/* Dark theme specific enhancements */
+:root.dark .classroom-card,
+:root.dark .chat-box,
+:root.dark .account-panel {
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+
+:root.dark .classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 35px rgba(96, 165, 250, 0.1);
+}
+
+:root.dark .chat-box {
+  box-shadow: var(--soft-shadow), 0 0 30px rgba(96, 165, 250, 0.1);
+}
+
+/* Dark blue theme specific enhancements */
+:root.dark-blue .classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 35px rgba(59, 130, 246, 0.15);
+}
+
+:root.dark-blue .chat-box {
+  box-shadow: var(--soft-shadow), 0 0 30px rgba(59, 130, 246, 0.15);
+}
+
+:root.dark-blue .universal-classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 50px rgba(6, 182, 212, 0.2);
+}
+
+/* Pink theme specific enhancements */
+:root.pink .classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 35px rgba(236, 72, 153, 0.15);
+}
+
+:root.pink .chat-box {
+  box-shadow: var(--soft-shadow), 0 0 30px rgba(236, 72, 153, 0.15);
+}
+
+:root.pink .universal-classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 50px rgba(139, 92, 246, 0.2);
+}
+
+/* Yellow theme specific enhancements */
+:root.yellow .classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 35px rgba(245, 158, 11, 0.15);
+}
+
+:root.yellow .chat-box {
+  box-shadow: var(--soft-shadow), 0 0 30px rgba(245, 158, 11, 0.15);
+}
+
+:root.yellow .universal-classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 50px rgba(16, 185, 129, 0.2);
+}
+
+/* Green theme specific enhancements */
+:root.green .classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 35px rgba(34, 197, 94, 0.15);
+}
+
+:root.green .chat-box {
+  box-shadow: var(--soft-shadow), 0 0 30px rgba(34, 197, 94, 0.15);
+}
+
+:root.green .universal-classroom-card {
+  box-shadow: var(--soft-shadow), 0 0 50px rgba(139, 92, 246, 0.2);
+}
+
+/* ==========================================================================
+   Interactive Element Consistency
+   ========================================================================== */
+
+/* Button consistency across all themes */
+.btn.classroom-primary {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  box-shadow: 0 4px 15px var(--classroom-border);
+}
+
+.btn.classroom-primary:hover {
+  box-shadow: 0 8px 25px var(--classroom-active);
+}
+
+.btn.classroom-secondary {
+  border-color: var(--classroom-border);
+}
+
+.btn.classroom-secondary:hover {
+  border-color: var(--theme-primary);
+  box-shadow: 0 4px 15px var(--classroom-glow);
+}
+
+/* Theme selector consistency */
+.theme-btn.active {
+  background: var(--theme-primary);
+  box-shadow: 0 2px 8px var(--classroom-border);
+}
+
+.theme-btn:hover:not(.active) {
+  background: var(--card-secondary);
+  box-shadow: 0 2px 8px var(--classroom-glow);
+}
+
+/* Input field consistency */
+.modern-input:focus,
+.message-input:focus,
+.form-input:focus {
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 3px var(--classroom-glow);
+}
+
+/* Loading spinner consistency */
+.loading-spinner,
+.loading-spinner-large {
+  border-top-color: var(--theme-primary);
+}
+
+/* Status indicator consistency */
+.status-indicator.loading {
+  color: var(--theme-primary);
+}
+
+.status-indicator.connected {
+  color: #10b981;
+}
+
+.status-indicator.error {
+  color: #ef4444;
+}
+
+/* ==========================================================================
+   Animation Consistency
+   ========================================================================== */
+
+/* Pulse glow animation for all themes */
+@keyframes classroom-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 8px 25px var(--classroom-border);
+  }
+  50% {
+    box-shadow: 0 12px 35px var(--classroom-active);
+  }
+}
+
+.classroom-avatar,
+.universal-classroom-card .classroom-avatar {
+  animation: classroom-pulse-glow 3s ease-in-out infinite;
+}
+
+/* Shimmer effect for all themes */
+@keyframes classroom-shimmer {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.classroom-card::before,
+.chat-box::before,
+.universal-classroom-card::before {
+  animation: classroom-shimmer 3s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Accessibility and High Contrast Support
+   ========================================================================== */
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+  .classroom-card,
+  .chat-box,
+  .account-panel {
+    border-width: 2px;
+    border-color: var(--theme-primary);
+  }
+
+  .btn.classroom-primary {
+    border: 2px solid var(--theme-primary);
+  }
+
+  .message.own .message-content {
+    border: 2px solid var(--theme-primary);
+  }
+
+  .anonymous-badge {
+    border: 2px solid var(--theme-accent);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .classroom-avatar,
+  .classroom-card::before,
+  .chat-box::before {
+    animation: none;
+  }
+
+  .classroom-card,
+  .chat-box,
+  .btn {
+    transition-duration: 0.1s;
+  }
+}
+
+/* ==========================================================================
+   Print Styles for Classroom Components
+   ========================================================================== */
+
+@media print {
+  .classroom-card,
+  .chat-box,
+  .account-panel {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .classroom-avatar {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+  }
+
+  .btn {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* ==========================================================================
+   Theme Transition Smoothness
+   ========================================================================== */
+
+/* Smooth theme transitions for all classroom components */
+.classroom-card,
+.chat-box,
+.account-panel,
+.classroom-avatar,
+.btn,
+.modern-input,
+.message-input {
+  transition: 
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Ensure theme variables transition smoothly */
+:root {
+  transition: 
+    --theme-primary 0.3s ease,
+    --theme-secondary 0.3s ease,
+    --theme-accent 0.3s ease,
+    --classroom-glow 0.3s ease,
+    --classroom-border 0.3s ease,
+    --classroom-hover 0.3s ease;
+}
+
+/* ==========================================================================
+   Mobile Theme Optimizations
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Reduce glow effects on mobile for better performance */
+  .classroom-card {
+    box-shadow: var(--soft-shadow), 0 0 20px var(--classroom-glow);
+  }
+
+  .chat-box {
+    box-shadow: var(--soft-shadow), 0 0 15px var(--classroom-glow);
+  }
+
+  .account-panel {
+    box-shadow: var(--soft-shadow), 0 0 25px var(--classroom-hover);
+  }
+
+  /* Optimize backdrop blur for mobile */
+  .classroom-card,
+  .chat-box,
+  .account-panel {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+}
+
+@media (max-width: 480px) {
+  /* Further reduce effects on very small screens */
+  .classroom-card,
+  .chat-box {
+    box-shadow: var(--soft-shadow);
+  }
+
+  .classroom-card:hover,
+  .chat-box:hover {
+    box-shadow: var(--soft-shadow), 0 0 15px var(--classroom-glow);
+  }
+
+  /* Minimal backdrop blur for performance */
+  .classroom-card,
+  .chat-box,
+  .account-panel {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}

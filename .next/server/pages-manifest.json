@@ -1,10 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/api/heartbeat": "pages/api/heartbeat.js",
-  "/dashboard": "pages/dashboard.js",
-  "/api/users": "pages/api/users.js",
-  "/api/confirm": "pages/api/confirm.js"
-}
+{"/_app":"pages/_app.js","/_error":"pages/_error.js","/account":"pages/account.html","/admin":"pages/admin.html","/api/admin/manage-user":"pages/api/admin/manage-user.js","/api/admin/reset-last-confirm":"pages/api/admin/reset-last-confirm.js","/api/admin/set-last-confirm":"pages/api/admin/set-last-confirm.js","/api/admin/simulate-confirm":"pages/api/admin/simulate-confirm.js","/api/admin/test-points":"pages/api/admin/test-points.js","/api/avatar":"pages/api/avatar.js","/api/change-password":"pages/api/change-password.js","/api/classrooms/[id]":"pages/api/classrooms/[id].js","/api/classrooms/[id]/join":"pages/api/classrooms/[id]/join.js","/api/classrooms/[id]/leave":"pages/api/classrooms/[id]/leave.js","/api/classrooms/[id]/users":"pages/api/classrooms/[id]/users.js","/api/classrooms":"pages/api/classrooms.js","/api/confirm":"pages/api/confirm.js","/api/delete-account":"pages/api/delete-account.js","/api/geolocate":"pages/api/geolocate.js","/api/heartbeat":"pages/api/heartbeat.js","/api/login":"pages/api/login.js","/api/logout":"pages/api/logout.js","/api/me":"pages/api/me.js","/api/personal-todos":"pages/api/personal-todos.js","/api/personal-todos/[id]/toggle":"pages/api/personal-todos/[id]/toggle.js","/api/register":"pages/api/register.js","/api/personal-todos/[id]":"pages/api/personal-todos/[id].js","/api/set-timezone":"pages/api/set-timezone.js","/api/todos/[id]":"pages/api/todos/[id].js","/api/todos/[id]/toggle":"pages/api/todos/[id]/toggle.js","/api/todos":"pages/api/todos.js","/api/user/anonymous":"pages/api/user/anonymous.js","/api/user/music-preference":"pages/api/user/music-preference.js","/api/users":"pages/api/users.js","/classroom/[id]":"pages/classroom/[id].html","/classrooms":"pages/classrooms.html","/dashboard":"pages/dashboard.html","/":"pages/index.html","/_document":"pages/_document.js","/404":"pages/404.html"}

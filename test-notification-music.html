@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Music System Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .test-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.error { background: #fef2f2; color: #dc2626; }
+        .status.info { background: #dbeafe; color: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Notification Music System Test</h1>
+    
+    <div class="test-section">
+        <h2>📁 Audio Files Test</h2>
+        <p>Testing if all notification music files are accessible:</p>
+        <div id="audio-files-status"></div>
+        <button class="test-button" onclick="testAudioFiles()">Test Audio Files</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔊 Audio Playback Test</h2>
+        <p>Test individual music files:</p>
+        <div id="playback-controls"></div>
+        <div id="playback-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎛️ Music Selection Test</h2>
+        <p>Test music selection functionality:</p>
+        <select id="music-selector" onchange="testMusicSelection()">
+            <option value="music1.mp3">Classic Bell</option>
+            <option value="music2.mp3">Gentle Chime</option>
+            <option value="music3.mp3">Digital Beep</option>
+            <option value="music4.mp3">Soft Ding</option>
+            <option value="music5.mp3">Notification Pop</option>
+            <option value="music6.mp3">Melodic Tone</option>
+            <option value="music7.mp3">Alert Sound</option>
+        </select>
+        <button class="test-button" onclick="playSelectedMusic()">Play Selected</button>
+        <div id="selection-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔔 Notification Integration Test</h2>
+        <p>Test notification system integration:</p>
+        <button class="test-button" onclick="testNotification('default')">Default Notification</button>
+        <button class="test-button success" onclick="testNotification('success')">Success Notification</button>
+        <button class="test-button danger" onclick="testNotification('danger')">Warning Notification</button>
+        <div id="notification-status"></div>
+    </div>
+
+    <script>
+        let currentAudio = null;
+        const musicFiles = [
+            'music1.mp3', 'music2.mp3', 'music3.mp3', 'music4.mp3',
+            'music5.mp3', 'music6.mp3', 'music7.mp3'
+        ];
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function testAudioFiles() {
+            updateStatus('audio-files-status', '🔄 Testing audio files...', 'info');
+            
+            const results = [];
+            for (const file of musicFiles) {
+                try {
+                    const audio = new Audio(`/audio/notifications/${file}`);
+                    await new Promise((resolve, reject) => {
+                        audio.addEventListener('canplaythrough', resolve);
+                        audio.addEventListener('error', reject);
+                        setTimeout(reject, 5000); // 5 second timeout
+                    });
+                    results.push(`✅ ${file} - OK`);
+                } catch (error) {
+                    results.push(`❌ ${file} - Failed`);
+                }
+            }
+            
+            const allPassed = results.every(r => r.includes('✅'));
+            updateStatus('audio-files-status', results.join('<br>'), allPassed ? 'success' : 'error');
+            
+            if (allPassed) {
+                createPlaybackControls();
+            }
+        }
+
+        function createPlaybackControls() {
+            const container = document.getElementById('playback-controls');
+            container.innerHTML = musicFiles.map(file => 
+                `<button class="test-button" onclick="playAudio('${file}')">${file}</button>`
+            ).join('');
+        }
+
+        function playAudio(filename) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            try {
+                currentAudio = new Audio(`/audio/notifications/${filename}`);
+                currentAudio.volume = 0.7;
+                
+                currentAudio.onended = () => {
+                    updateStatus('playback-status', `✅ Finished playing ${filename}`, 'success');
+                    currentAudio = null;
+                };
+                
+                currentAudio.onerror = () => {
+                    updateStatus('playback-status', `❌ Error playing ${filename}`, 'error');
+                    currentAudio = null;
+                };
+                
+                currentAudio.play();
+                updateStatus('playback-status', `🔊 Playing ${filename}...`, 'info');
+            } catch (error) {
+                updateStatus('playback-status', `❌ Failed to load ${filename}: ${error.message}`, 'error');
+            }
+        }
+
+        function testMusicSelection() {
+            const selector = document.getElementById('music-selector');
+            const selected = selector.value;
+            updateStatus('selection-status', `🎵 Selected: ${selected}`, 'info');
+        }
+
+        function playSelectedMusic() {
+            const selector = document.getElementById('music-selector');
+            const selected = selector.value;
+            playAudio(selected);
+            updateStatus('selection-status', `🔊 Playing selected music: ${selected}`, 'info');
+        }
+
+        function testNotification(type) {
+            // Simulate notification with sound
+            const selector = document.getElementById('music-selector');
+            const selectedMusic = selector.value;
+            
+            // Play notification sound
+            playAudio(selectedMusic);
+            
+            // Show mock notification dialog
+            const messages = {
+                default: 'This is a default notification with your selected music.',
+                success: 'Success! This notification plays your chosen sound.',
+                danger: 'Warning! This alert uses your custom notification music.'
+            };
+            
+            setTimeout(() => {
+                alert(messages[type] || messages.default);
+                updateStatus('notification-status', `✅ ${type} notification test completed with ${selectedMusic}`, 'success');
+            }, 500);
+            
+            updateStatus('notification-status', `🔔 Testing ${type} notification with ${selectedMusic}...`, 'info');
+        }
+
+        // Initialize
+        window.onload = function() {
+            updateStatus('audio-files-status', 'Click "Test Audio Files" to verify all music files are accessible.', 'info');
+            updateStatus('playback-status', 'Audio files will appear here after testing.', 'info');
+            updateStatus('selection-status', 'Select a music file from the dropdown above.', 'info');
+            updateStatus('notification-status', 'Click any notification button to test integration.', 'info');
+        };
+    </script>
+</body>
+</html>
